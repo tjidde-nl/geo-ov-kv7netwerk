@@ -111,7 +111,7 @@ public class DataReceiverServlet extends HttpServlet {
                 conn = ds.getConnection();
 
                 java.sql.Timestamp now = new java.sql.Timestamp(new Date().getTime());
-                new QueryRunner().update(conn, "insert into data.imports(recv_date, file, file_md5, state, state_date, log) values (?, ?, ?, ?, ?, ?)",
+                new QueryRunner().update(conn, "insert into data.data(recv_date, filename, file_md5, state, state_date, log) values (?, ?, ?, ?, ?, ?)",
                         now,
                         f.getAbsolutePath(),
                         hash,
