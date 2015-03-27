@@ -135,7 +135,9 @@ public class DataLoader {
                 insert.append(table[1][i]);
                 insertValues.append("?");
             }
-            createTable.append(")");
+            createTable.append(", data_id integer, row_num integer)");
+            insert.append(", data_id, line");
+            insertValues.append(", ?, ?");
             insert.append(insertValues).append(")");
 
             if(!createdTables.contains(table[0][0])) {
@@ -145,8 +147,13 @@ public class DataLoader {
 
             List<Object[]> rows = new ArrayList<Object[]>();
 
+            int rowNum = 0;
             while((row = dp.nextRow()) != null) {
-                rows.add(row);
+                Object[] rowDataId = new Object[row.length+2];
+                System.arraycopy(row, 0, rowDataId, 0, row.length);
+                rowDataId[rowDataId.length-2] = dataRow.get("id");
+                rowDataId[rowDataId.length-1] = rowNum++;
+                rows.add(rowDataId);
 
                 if(rows.size() == 100) {
                     new QueryRunner().batch(c, insert.toString(), rows.toArray(new Object[][] {}));

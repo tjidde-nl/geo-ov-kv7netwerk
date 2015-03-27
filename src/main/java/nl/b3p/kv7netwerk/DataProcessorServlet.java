@@ -139,6 +139,8 @@ public class DataProcessorServlet extends HttpServlet {
         new QueryRunner().query(c, "select addgeometrycolumn('" + schema + "', 'map_userstop', 'the_geom', 28992, 'POINT', 2)", new MapHandler());
         new QueryRunner().update(c, "update map_userstop set the_geom = st_setsrid(st_makepoint(locationx_ew::double precision, locationy_ns::double precision),28992)");
         new QueryRunner().update(c, "create index map_userstop_idx on map_userstop using gist(the_geom)");
+        new QueryRunner().update(c, "alter table map_userstop add column id serial");
+        new QueryRunner().update(c, "alter table map_userstop add primary key(id)");
 
         // voeg punt geometrie toe aan jopatiminglinkpool
         new QueryRunner().query(c, "select addgeometrycolumn('" + schema + "', 'jopatiminglinkpool', 'the_geom', 28992, 'POINT', 2)", new MapHandler());
@@ -147,7 +149,7 @@ public class DataProcessorServlet extends HttpServlet {
 
         // maak tabel met distinct lijnen joined met info uit line
         new QueryRunner().update(c, "create table map_line as\n" +
-            " select distinct j.dataownercode,j.lineplanningnumber,linepublicnumber,linename,transporttype,j.journeypatterncode, validfrom::date\n" +
+            " select distinct j.dataownercode,j.lineplanningnumber,linepublicnumber,linename,transporttype,j.data_id,j.journeypatterncode, validfrom::date\n" +
             " from jopatiminglinkpool j\n" +
             " left join line l on (l.dataownercode=j.dataownercode and l.lineplanningnumber=j.lineplanningnumber)");
 
@@ -162,7 +164,8 @@ public class DataProcessorServlet extends HttpServlet {
             "	where ml2.dataownercode=ml.dataownercode \n" +
             "	and ml2.lineplanningnumber=ml.lineplanningnumber \n" +
             "	and ml2.journeypatterncode=ml.journeypatterncode \n" +
-            "	and ml2.validfrom > ml.validfrom)");
+            "	and ml2.validfrom > ml.validfrom\n" +
+            "   and ml2.data_id = ml.data_id)");
 
         new QueryRunner().query(c, "select addgeometrycolumn('" + schema + "', 'map_line', 'the_geom', 28992, 'LINESTRING', 2)", new MapHandler());
 
@@ -175,7 +178,9 @@ public class DataProcessorServlet extends HttpServlet {
             "	and j.lineplanningnumber=ml.lineplanningnumber \n" +
             "	and j.journeypatterncode=ml.journeypatterncode\n" +
             "	and j.validfrom::date=ml.validfrom\n" +
-            "	group by ml.dataownercode,ml.lineplanningnumber,ml.journeypatterncode)\n");
+            "   and j.locationx_ew::int <> 0\n" +
+            "   and j.locationy_ns::int <> 0\n" +
+            "	group by ml.dataownercode,ml.lineplanningnumber,ml.journeypatterncode,j.validfrom,j.data_id)\n");
 
         new QueryRunner().update(c, "create index map_line_idx on map_line using gist(the_geom)");
     }
