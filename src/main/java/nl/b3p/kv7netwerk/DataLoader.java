@@ -136,7 +136,7 @@ public class DataLoader {
                 insertValues.append("?");
             }
             createTable.append(", data_id integer, row_num integer)");
-            insert.append(", data_id, line");
+            insert.append(", data_id, row_num");
             insertValues.append(", ?, ?");
             insert.append(insertValues).append(")");
 
