@@ -99,6 +99,8 @@ public class DataProcessorServlet extends HttpServlet {
 
             processGeometry(c, schema);
 
+            createViews(c, schema);
+
             for(String oldSchema: new QueryRunner().query(c, "select schema from netwerk where state = 'active'", new ColumnListHandler<String>())) {
                 msg = "Verwijderen oud schema " + oldSchema;
                 log.info(msg); w.println(msg); rw.println(msg); rw.flush();
@@ -183,5 +185,17 @@ public class DataProcessorServlet extends HttpServlet {
             "	group by ml.dataownercode,ml.lineplanningnumber,ml.journeypatterncode,j.validfrom,j.data_id)\n");
 
         new QueryRunner().update(c, "create index map_line_idx on map_line using gist(the_geom)");
+    }
+
+    private void createViews(Connection c, String schema) throws SQLException {
+        new QueryRunner().update(c, "drop view data.mapline_recent");
+        String sql = String.format("create view data.mapline_recent as " +
+                "select * from %s.map_line " +
+                "where validfrom <= now() and (validto is null or validto >= now());", schema);
+        new QueryRunner().update(c, sql);
+        new QueryRunner().update(c, "drop view data.userstop_recent");
+        sql = String.format("create view data.userstop_recent as " +
+                "select * from %s.map_userstop", schema);
+        new QueryRunner().update(c, sql);
     }
 }
