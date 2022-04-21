@@ -96,7 +96,7 @@ public class DataLoader {
 
             new QueryRunner().update(c, "update data set state='loaded', state_date = ?, log=? where id = ?",
                     new java.sql.Timestamp(System.currentTimeMillis()), rowLog, dataRow.get("id"));
-        } catch(Exception e) {
+        } catch(Throwable e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             rowLog += "\n" + "Fout tijdens verwerken: " + sw.toString();

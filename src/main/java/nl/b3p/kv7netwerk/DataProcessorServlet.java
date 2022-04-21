@@ -111,8 +111,8 @@ public class DataProcessorServlet extends HttpServlet {
 
             msg = "Verwerking gelukt! Totale tijd " + DurationFormatUtils.formatPeriod(startTime, System.currentTimeMillis(), "mm:ss");
             log.info(msg); w.println(msg); rw.println(msg); rw.flush();
-        } catch(Exception e) {
-            log.error(e);
+        } catch(Throwable e) {
+            log.error("Fout bij verwerken bestanden", e);
             e.printStackTrace(w);
             e.printStackTrace(rw);
         } finally {
