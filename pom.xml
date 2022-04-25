@@ -9,7 +9,6 @@
 
     <name>geo-ov-kv7netwerk</name>
     <url>http://maven.apache.org</url>
-
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>

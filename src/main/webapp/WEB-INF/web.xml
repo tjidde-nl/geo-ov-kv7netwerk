@@ -8,10 +8,12 @@
             <param-name>dir</param-name>
             <param-value>/var/opt/kv7netwerk</param-value>
         </init-param>
+        <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet>
         <servlet-name>DataProcessorServlet</servlet-name>
         <servlet-class>nl.b3p.kv7netwerk.DataProcessorServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>DataReceiverServlet</servlet-name>
